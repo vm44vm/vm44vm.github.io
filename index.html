@@ -34,9 +34,13 @@
       border-radius: 4px;
       font-size: 16px;
       outline: none;
+      transition: border-color 0.3s ease-in-out;
     }
-    input[type="text"]:focus {
-      border-color: #4CAF50;
+    input.correct {
+      border-color: #28a745;
+    }
+    input.incorrect {
+      border-color: #dc3545;
     }
     button {
       padding: 10px 20px;
@@ -48,7 +52,11 @@
       font-size: 16px;
       margin-top: 10px;
     }
-    button:hover {
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
       background-color: #45a049;
     }
     #response {
@@ -56,41 +64,53 @@
       font-size: 18px;
       margin-top: 15px;
     }
-    .correct {
-      color: #28a745;
-    }
-    .incorrect {
-      color: #dc3545;
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h2>Enter the correct text</h2>
-    <input type="text" id="textInput" placeholder="Type here...">
-    <button onclick="checkInput()">Submit</button>
+    <input type="text" id="textInput" placeholder="Type here..." oninput="validateInput()" onkeydown="handleKeyPress(event)">
+    <button id="submitBtn" onclick="checkInput()" disabled>Submit</button>
     <p id="response"></p>
   </div>
 
   <script>
-    const encodedCorrectString = "aHlkcjE=";
+    const encodedCorrectString = "aHlkcjE="; // Encoded "hydr1"
 
     function decodeBase64(encodedStr) {
       return atob(encodedStr);
     }
 
+    function validateInput() {
+      const inputField = document.getElementById("textInput");
+      const submitBtn = document.getElementById("submitBtn");
+      
+      submitBtn.disabled = inputField.value.trim() === "";
+    }
+
     function checkInput() {
-      const input = document.getElementById("textInput").value.trim();
+      const inputField = document.getElementById("textInput");
       const response = document.getElementById("response");
       const correctString = decodeBase64(encodedCorrectString);
-      
+      const input = inputField.value.trim();
+
       if (input === correctString) {
         response.textContent = "Correct!";
         response.style.color = "green";
+        inputField.classList.add("correct");
+        inputField.classList.remove("incorrect");
       } else {
         response.textContent = "Try again";
         response.style.color = "red";
+        inputField.classList.add("incorrect");
+        inputField.classList.remove("correct");
+      }
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === "Enter" && !document.getElementById("submitBtn").disabled) {
+        checkInput();
       }
     }
   </script>
