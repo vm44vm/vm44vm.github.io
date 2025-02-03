@@ -34,13 +34,22 @@
       border-radius: 4px;
       font-size: 16px;
       outline: none;
-      transition: border-color 0.3s ease-in-out;
+      transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
     input.correct {
       border-color: #28a745;
+      box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
     }
     input.incorrect {
       border-color: #dc3545;
+      animation: shake 0.3s ease-in-out;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
     button {
       padding: 10px 20px;
@@ -51,6 +60,7 @@
       cursor: pointer;
       font-size: 16px;
       margin-top: 10px;
+      transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
     }
     button:disabled {
       background-color: #ccc;
@@ -58,11 +68,17 @@
     }
     button:hover:not(:disabled) {
       background-color: #45a049;
+      transform: scale(1.05);
     }
     #response {
       font-weight: bold;
       font-size: 18px;
       margin-top: 15px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .fade-in {
+      opacity: 1 !important;
     }
   </style>
 </head>
@@ -95,6 +111,8 @@
       const correctString = decodeBase64(encodedCorrectString);
       const input = inputField.value.trim();
 
+      response.classList.remove("fade-in"); // Reset animation
+
       if (input === correctString) {
         response.textContent = "Correct!";
         response.style.color = "green";
@@ -106,6 +124,11 @@
         inputField.classList.add("incorrect");
         inputField.classList.remove("correct");
       }
+
+      // Fade in response
+      setTimeout(() => {
+        response.classList.add("fade-in");
+      }, 100);
     }
 
     function handleKeyPress(event) {
